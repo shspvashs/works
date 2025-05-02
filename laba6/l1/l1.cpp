@@ -1,4 +1,4 @@
-﻿#define GLEW_DLL
+#define GLEW_DLL
 #define GLFW_DLL
 
 #include <cstdio>
@@ -94,7 +94,7 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    float cameraSpeed = 0.1;
+    float cameraSpeed = 0.01;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
 
@@ -151,9 +151,11 @@ int main()
 
     Shader ourShader("vertex_shader.glsl", "fragment_shader.glsl");
     Model Arm("..\\bl\\nika (1).obj");
+    glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window))
     {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(1.0, 1.0, 1.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -184,7 +186,7 @@ int main()
         glm::vec3 ambient = lightcolor * glm::vec3(0.1);
         glm::vec3 diffuse = lightcolor * glm::vec3(0.7);
         glm::vec3 specular = lightcolor;
-        glm::vec3 position = glm::vec3(1.0, 0.0, 1.0);
+        glm::vec3 position = glm::vec3(20.0, 5.0, 0.0);
 
         settingVec3(ourShader.Program, "light_1.ambient", ambient);
         settingVec3(ourShader.Program, "light_1.diffuse", diffuse);
@@ -193,9 +195,9 @@ int main()
 
         //материал
 
-        glm::vec3 matambient = glm::vec3(0.5, 0.0, 0.5);
+        glm::vec3 matambient = glm::vec3(0.2, 0.0, 0.2);
         glm::vec3 matdiffuse = glm::vec3(0.1, 0.0, 0.4);
-        glm::vec3 matspecular = glm::vec3(0.9, 0.0, 1.0);
+        glm::vec3 matspecular = glm::vec3(0.4, 0.0, 1.0);
         glm::vec3 matshinies = glm::vec3(32.0);
 
         settingVec3(ourShader.Program, "mat_1.ambient", matambient);
@@ -211,6 +213,11 @@ int main()
         settingMat4(ourShader.Program, "projection", projection);
         settingMat4(ourShader.Program, "view", view);
         settingMat4(ourShader.Program, "model", model);
+        
+        
+        
+        normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
+        settingMat3(ourShader.Program, "normalMatrix", normalMatrix);
 
         Arm.Draw(ourShader);
 
